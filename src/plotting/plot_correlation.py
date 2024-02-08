@@ -1,0 +1,98 @@
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Determine project directory
+project_dir = os.path.dirname(os.path.abspath(__file__))
+print(project_dir)
+
+# Load the CSV file using the project directory
+csv_path_biosignals = os.path.join(project_dir, "RECOLA-Biosignals-recordings", "P56.csv")
+csv_path_valence = os.path.join(project_dir, "RECOLA-Annotation", "emotional_behaviour", "valence", "P56.csv")
+csv_path_arousal = os.path.join(project_dir, "RECOLA-Annotation", "emotional_behaviour", "arousal", "P56.csv")
+
+# Read the CSV file into a DataFrame
+df_biosignals = pd.read_csv(csv_path_biosignals, delimiter=';')
+df_valence = pd.read_csv(csv_path_valence, delimiter=';')
+df_arousal = pd.read_csv(csv_path_arousal, delimiter=';')
+
+df_biosignals.columns = df_biosignals.columns.str.strip()
+df_valence.columns = df_valence.columns.str.strip()
+df_arousal.columns = df_arousal.columns.str.strip()
+
+df_biosignals = df_biosignals[df_biosignals['time'] <= 300]
+df_valence = df_valence[df_valence['time'] <= 300]
+df_arousal = df_arousal[df_arousal['time'] <= 300]
+
+
+# Changing the frequency of sampling - 1 is standard
+df_biosignals = df_biosignals.set_index('time').rolling(window=1).mean().dropna()[
+                ::1]  # normally biosignals sample rate is every 0.001s
+df_valence = df_valence.set_index('time').rolling(window=1).mean().dropna()[
+             ::1]  # normally behaviour sample rate is every 0.04s
+df_arousal = df_arousal.set_index('time').rolling(window=1).mean().dropna()[
+             ::1]  # normally behaviour sample rate is every 0.04s
+
+
+def max_abs_value(row):
+    return max(row.min(), row.max(), key=abs)
+
+
+# Calculate the values from 'FM1', 'FM2', 'FM3', 'FF1', 'FF2', and 'FF3' columns
+df_valence['mean_behaviour_rate'] = df_valence[['FM1', 'FM2', 'FM3', 'FF1', 'FF2', 'FF3']].mean(axis=1)
+df_valence['max_abs_behaviour_rate'] = df_valence[['FM1', 'FM2', 'FM3', 'FF1', 'FF2', 'FF3']].abs().max(axis=1)
+df_valence['max_from_0_behaviour_rate'] = df_valence[['FM1', 'FM2', 'FM3', 'FF1', 'FF2', 'FF3']].apply(max_abs_value,
+                                                                                                       axis=1)
+
+df_arousal['mean_behaviour_rate'] = df_arousal[['FM1', 'FM2', 'FM3', 'FF1', 'FF2', 'FF3']].mean(axis=1)
+df_arousal['max_abs_behaviour_rate'] = df_arousal[['FM1', 'FM2', 'FM3', 'FF1', 'FF2', 'FF3']].abs().max(axis=1)
+df_arousal['max_from_0_behaviour_rate'] = df_arousal[['FM1', 'FM2', 'FM3', 'FF1', 'FF2', 'FF3']].apply(max_abs_value,
+                                                                                                       axis=1)
+
+mean_eda_value = df_biosignals['EDA'].mean()
+
+print("Mean EDA value:", mean_eda_value)
+df_biosignals['EDA'] -= mean_eda_value
+df_biosignals['ECG_mirror'] = df_biosignals['ECG'] * -1
+
+df_biosignals['ECG_smooth'] = df_biosignals['ECG_mirror'].rolling(window=1000, min_periods=1).mean()
+df_biosignals['EDA_smooth'] = df_biosignals['EDA'].rolling(window=10, min_periods=1).mean()
+
+plt.plot(df_biosignals.index, df_biosignals['EDA_smooth'], label='EDA_smooth')
+plt.plot(df_biosignals.index, df_biosignals['ECG_smooth'], label='ECG_smooth')
+
+#plt.plot(df_biosignals.index, df_biosignals['EDA'], label='EDA')
+#plt.plot(df_biosignals.index, df_biosignals['ECG'], label='ECG')
+
+# Plot the data from the second CSV file - valence
+# plt.plot(df_valence.index, df_valence['FM1'], label='valence_FM1')
+# plt.plot(df_valence.index, df_valence['FM2'], label='valence_FM2')
+# plt.plot(df_valence.index, df_valence['FM3'], label='valence_FM3')
+# plt.plot(df_valence.index, df_valence['FF1'], label='valence_FF1')
+# plt.plot(df_valence.index, df_valence['FF2'], label='valence_FF2')
+# plt.plot(df_valence.index, df_valence['FF3'], label='valence_FF3')
+
+# Plot the data from the second CSV file - arousal
+# plt.plot(df_arousal.index, df_arousal['FM1'], label='arousal_FM1')
+# plt.plot(df_arousal.index, df_arousal['FM2'], label='arousal_FM2')
+# plt.plot(df_arousal.index, df_arousal['FM3'], label='arousal_FM3')
+# plt.plot(df_arousal.index, df_arousal['FF1'], label='arousal_FF1')
+# plt.plot(df_arousal.index, df_arousal['FF2'], label='arousal_FF2')
+# plt.plot(df_arousal.index, df_arousal['FF3'], label='arousal_FF3')
+
+
+plt.plot(df_valence.index, df_valence['mean_behaviour_rate'], label='valence_mean_behaviour_rate')
+# plt.plot(df_valence.index, df_valence['max_abs_behaviour_rate'], label='valence_max_abs_behaviour_rate')
+# plt.plot(df_valence.index, df_valence['max_from_0_behaviour_rate'], label='valence_max_from_0_behaviour_rate')
+
+plt.plot(df_arousal.index, df_arousal['mean_behaviour_rate'], label='arousal_mean_behaviour_rate')
+# plt.plot(df_arousal.index, df_arousal['max_abs_behaviour_rate'], label='arousal_max_abs_behaviour_rate')
+# plt.plot(df_arousal.index, df_arousal['max_from_0_behaviour_rate'], label='arousal_max_from_0_behaviour_rate')
+
+plt.xlabel('Time')
+plt.ylabel('Values')
+plt.title('EDA and ECG Plot')
+plt.legend()
+plt.grid(True)
+plt.show()
+
