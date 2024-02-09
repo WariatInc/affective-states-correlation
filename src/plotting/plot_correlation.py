@@ -1,15 +1,20 @@
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.signal import find_peaks
+import neurokit2 as nk
+import numpy as np
 
 # Determine project directory
 project_dir = os.path.dirname(os.path.abspath(__file__))
 print(project_dir)
 
+file = "P16.csv"
+
 # Load the CSV file using the project directory
-csv_path_biosignals = os.path.join(project_dir, "RECOLA-Biosignals-recordings", "P56.csv")
-csv_path_valence = os.path.join(project_dir, "RECOLA-Annotation", "emotional_behaviour", "valence", "P56.csv")
-csv_path_arousal = os.path.join(project_dir, "RECOLA-Annotation", "emotional_behaviour", "arousal", "P56.csv")
+csv_path_biosignals = os.path.join(project_dir, "RECOLA-Biosignals-recordings", file)
+csv_path_valence = os.path.join(project_dir, "RECOLA-Annotation", "emotional_behaviour", "valence", file)
+csv_path_arousal = os.path.join(project_dir, "RECOLA-Annotation", "emotional_behaviour", "arousal", file)
 
 # Read the CSV file into a DataFrame
 df_biosignals = pd.read_csv(csv_path_biosignals, delimiter=';')
@@ -49,17 +54,58 @@ df_arousal['max_abs_behaviour_rate'] = df_arousal[['FM1', 'FM2', 'FM3', 'FF1', '
 df_arousal['max_from_0_behaviour_rate'] = df_arousal[['FM1', 'FM2', 'FM3', 'FF1', 'FF2', 'FF3']].apply(max_abs_value,
                                                                                                        axis=1)
 
-mean_eda_value = df_biosignals['EDA'].mean()
+# mean_eda_value = df_biosignals['EDA'].mean()
 
-print("Mean EDA value:", mean_eda_value)
-df_biosignals['EDA'] -= mean_eda_value
+# print("Mean EDA value:", mean_eda_value)
+# df_biosignals['EDA'] -= mean_eda_value
 df_biosignals['ECG_mirror'] = df_biosignals['ECG'] * -1
 
 df_biosignals['ECG_smooth'] = df_biosignals['ECG_mirror'].rolling(window=1000, min_periods=1).mean()
 df_biosignals['EDA_smooth'] = df_biosignals['EDA'].rolling(window=10, min_periods=1).mean()
 
+# ====================== lukas code ======================
+
+# Normalization of EDA
+original_series = df_biosignals['EDA_smooth']
+normalized_series = (original_series - original_series.min()) / (original_series.max() - original_series.min()) - 0.5
+df_biosignals['EDA_smooth'] = normalized_series
+
+# Normalization of ECG
+original_series = df_biosignals['ECG_smooth']
+normalized_series = (original_series - original_series.min()) / (original_series.max() - original_series.min()) - 0.5
+df_biosignals['ECG_smooth'] = normalized_series
+
+# Normalization of AROUSAL
+original_series = df_arousal['mean_behaviour_rate']
+normalized_series = (original_series - original_series.min()) / (original_series.max() - original_series.min()) - 0.5
+df_arousal['mean_behaviour_rate'] = normalized_series
+
+# Normalization of VALANCE
+original_series = df_valence['mean_behaviour_rate']
+normalized_series = (original_series - original_series.min()) / (original_series.max() - original_series.min()) - 0.5
+df_valence['mean_behaviour_rate'] = normalized_series
+
+# Find peaks
+eda_smooth_series = df_biosignals['EDA_smooth']
+
+# Find peaks using scipy's find_peaks function
+# peaks, _ = find_peaks(x=eda_smooth_series, distance=700, width=100)
+# min_peaks, _ = find_peaks(x=-eda_smooth_series, distance=700, width=100)
+
+# Find peaks using neurokit2 find_peaks function
+_, nk_data = nk.eda_peaks(eda_smooth_series)
+peaks = nk_data['SCR_Peaks']
+
+# Plot peaks scatter points and lines
+plt.scatter(df_biosignals['EDA_smooth'].index[peaks], eda_smooth_series.iloc[peaks], color='red', label='Peaks')
+# plt.scatter(df_biosignals['EDA_smooth'].index[min_peaks], eda_smooth_series.iloc[min_peaks], color='green', label='Min Peaks')
+plt.vlines(df_biosignals['EDA_smooth'].index[peaks], ymin=-0.5, ymax=0.5, colors='purple', linestyles='dashed', label='Vertical Lines at -0.5 and 0.5')
+
+# ========================================================
+
+# plt.plot(df_biosignals.index, df_biosignals['ECG_smooth'], label='ECG_smooth')
 plt.plot(df_biosignals.index, df_biosignals['EDA_smooth'], label='EDA_smooth')
-plt.plot(df_biosignals.index, df_biosignals['ECG_smooth'], label='ECG_smooth')
+
 
 #plt.plot(df_biosignals.index, df_biosignals['EDA'], label='EDA')
 #plt.plot(df_biosignals.index, df_biosignals['ECG'], label='ECG')
@@ -85,7 +131,7 @@ plt.plot(df_valence.index, df_valence['mean_behaviour_rate'], label='valence_mea
 # plt.plot(df_valence.index, df_valence['max_abs_behaviour_rate'], label='valence_max_abs_behaviour_rate')
 # plt.plot(df_valence.index, df_valence['max_from_0_behaviour_rate'], label='valence_max_from_0_behaviour_rate')
 
-plt.plot(df_arousal.index, df_arousal['mean_behaviour_rate'], label='arousal_mean_behaviour_rate')
+# plt.plot(df_arousal.index, df_arousal['mean_behaviour_rate'], label='arousal_mean_behaviour_rate')
 # plt.plot(df_arousal.index, df_arousal['max_abs_behaviour_rate'], label='arousal_max_abs_behaviour_rate')
 # plt.plot(df_arousal.index, df_arousal['max_from_0_behaviour_rate'], label='arousal_max_from_0_behaviour_rate')
 
@@ -96,3 +142,13 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
+
+## ============================== DRAFT ==============================
+# Derivative
+# eda_smooth_series = df_biosignals['EDA_smooth']
+# eda_smooth_series = df_biosignals['ECG_smooth']
+# eda_derivative = np.gradient(eda_smooth_series, df_biosignals.index)
+
+# rolling_mean = pd.Series(eda_derivative).rolling(window=1000, min_periods=5).mean()
+# normalized_derivative = (rolling_mean - rolling_mean.min()) / (rolling_mean.max() - rolling_mean.min()) - 0.5
+# plt.plot(df_biosignals.index, normalized_derivative, label='Derivative', linestyle='--')
