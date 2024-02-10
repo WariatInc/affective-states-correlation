@@ -9,7 +9,7 @@ import numpy as np
 project_dir = os.path.dirname(os.path.abspath(__file__))
 print(project_dir)
 
-file = "P16.csv"
+file = "P19.csv"
 
 # Load the CSV file using the project directory
 csv_path_biosignals = os.path.join(project_dir, "RECOLA-Biosignals-recordings", file)
@@ -96,10 +96,28 @@ eda_smooth_series = df_biosignals['EDA_smooth']
 _, nk_data = nk.eda_peaks(eda_smooth_series)
 peaks = nk_data['SCR_Peaks']
 
+# Define the number of neighboring points to mark around each peak
+neighborhood = 1000
+
+# Create an empty list to store the extended peaks
+extended_peaks = []
+
+# Iterate over each detected peak
+for peak_index in peaks:
+    # Extend the peak by including neighboring points
+    extended_peak_indices = np.arange(max(peak_index - neighborhood, 0), min(peak_index + neighborhood + 1, len(eda_smooth_series)))
+    extended_peaks.extend(extended_peak_indices)
+
+# Remove duplicate indices
+extended_peaks = list(set(extended_peaks))
+
 # Plot peaks scatter points and lines
-plt.scatter(df_biosignals['EDA_smooth'].index[peaks], eda_smooth_series.iloc[peaks], color='red', label='Peaks')
-# plt.scatter(df_biosignals['EDA_smooth'].index[min_peaks], eda_smooth_series.iloc[min_peaks], color='green', label='Min Peaks')
-plt.vlines(df_biosignals['EDA_smooth'].index[peaks], ymin=-0.2, ymax=0.5, colors='purple', linestyles='dashed', label='Vertical Lines at -0.5 and 0.5')
+# plt.scatter(df_biosignals['EDA_smooth'].index[extended_peaks], eda_smooth_series.iloc[peaks], color='red', label='Peaks')
+# # plt.scatter(df_biosignals['EDA_smooth'].index[min_peaks], eda_smooth_series.iloc[min_peaks], color='green', label='Min Peaks')
+# plt.vlines(df_biosignals['EDA_smooth'].index[peaks], ymin=-0.2, ymax=0.5, colors='purple', linestyles='dashed', label='Vertical Lines at -0.5 and 0.5')
+
+plt.scatter(df_biosignals['EDA_smooth'].index[extended_peaks], eda_smooth_series.iloc[extended_peaks], color='blue', label='Extended Peaks')
+plt.scatter(df_biosignals['EDA_smooth'].index[peaks], eda_smooth_series.iloc[peaks], color='red', label='Original Peaks')
 
 # ========================================================
 
@@ -135,6 +153,8 @@ plt.plot(df_valence.index, df_valence['mean_behaviour_rate'], label='valence_mea
 # plt.plot(df_arousal.index, df_arousal['max_abs_behaviour_rate'], label='arousal_max_abs_behaviour_rate')
 # plt.plot(df_arousal.index, df_arousal['max_from_0_behaviour_rate'], label='arousal_max_from_0_behaviour_rate')
 
+
+
 plt.xlabel('Time')
 plt.ylabel('Values')
 plt.title('EDA and ECG Plot')
@@ -152,3 +172,5 @@ plt.show()
 # rolling_mean = pd.Series(eda_derivative).rolling(window=1000, min_periods=5).mean()
 # normalized_derivative = (rolling_mean - rolling_mean.min()) / (rolling_mean.max() - rolling_mean.min()) - 0.5
 # plt.plot(df_biosignals.index, normalized_derivative, label='Derivative', linestyle='--')
+
+
