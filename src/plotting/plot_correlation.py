@@ -67,7 +67,7 @@ df_biosignals['EDA_smooth'] = df_biosignals['EDA'].rolling(window=10, min_period
 
 # Normalization of EDA
 original_series = df_biosignals['EDA_smooth']
-normalized_series = (original_series - original_series.min()) / (original_series.max() - original_series.min()) - 0.5
+normalized_series = 0.5*(original_series - original_series.min()) / (original_series.max() - original_series.min())
 df_biosignals['EDA_smooth'] = normalized_series
 
 # Normalization of ECG
@@ -75,15 +75,15 @@ original_series = df_biosignals['ECG_smooth']
 normalized_series = (original_series - original_series.min()) / (original_series.max() - original_series.min()) - 0.5
 df_biosignals['ECG_smooth'] = normalized_series
 
-# Normalization of AROUSAL
-original_series = df_arousal['mean_behaviour_rate']
-normalized_series = (original_series - original_series.min()) / (original_series.max() - original_series.min()) - 0.5
-df_arousal['mean_behaviour_rate'] = normalized_series
-
-# Normalization of VALANCE
-original_series = df_valence['mean_behaviour_rate']
-normalized_series = (original_series - original_series.min()) / (original_series.max() - original_series.min()) - 0.5
-df_valence['mean_behaviour_rate'] = normalized_series
+# # Normalization of AROUSAL
+# original_series = df_arousal['mean_behaviour_rate']
+# normalized_series = (original_series - original_series.min()) / (original_series.max() - original_series.min()) - 0.5
+# df_arousal['mean_behaviour_rate'] = normalized_series
+#
+# # Normalization of VALANCE
+# original_series = df_valence['mean_behaviour_rate']
+# normalized_series = (original_series - original_series.min()) / (original_series.max() - original_series.min()) - 0.5
+# df_valence['n_mean_behaviour_rate'] = normalized_series
 
 # Find peaks
 eda_smooth_series = df_biosignals['EDA_smooth']
@@ -99,7 +99,7 @@ peaks = nk_data['SCR_Peaks']
 # Plot peaks scatter points and lines
 plt.scatter(df_biosignals['EDA_smooth'].index[peaks], eda_smooth_series.iloc[peaks], color='red', label='Peaks')
 # plt.scatter(df_biosignals['EDA_smooth'].index[min_peaks], eda_smooth_series.iloc[min_peaks], color='green', label='Min Peaks')
-plt.vlines(df_biosignals['EDA_smooth'].index[peaks], ymin=-0.5, ymax=0.5, colors='purple', linestyles='dashed', label='Vertical Lines at -0.5 and 0.5')
+plt.vlines(df_biosignals['EDA_smooth'].index[peaks], ymin=-0.2, ymax=0.5, colors='purple', linestyles='dashed', label='Vertical Lines at -0.5 and 0.5')
 
 # ========================================================
 
