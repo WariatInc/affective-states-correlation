@@ -29,7 +29,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 # Step 5: Train the model
 model = RandomForestClassifier()
 model.fit(X_train, y_train)
-
-# Step 6: Evaluate the model
+#z
+# Step 6: Evaluate the model#
 y_pred = model.predict(X_test)
 print(classification_report(y_test, y_pred))
