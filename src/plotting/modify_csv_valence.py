@@ -29,7 +29,7 @@ def add_classes_and_save_to_csv(project_dir, file):
     output_csv_path = os.path.join(project_dir, "valance_classes_csv", file)
 
     # Save the DataFrame to a CSV file
-    df_valence.to_csv(output_csv_path, index=False)
+    df_valence.to_csv(output_csv_path, index=False, sep=';')
 
 # Determine project directory
 project_dir = os.path.dirname(os.path.abspath(__file__))

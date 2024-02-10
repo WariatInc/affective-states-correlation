@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 project_dir = os.path.dirname(os.path.abspath(__file__))
 print(project_dir)
 
-file = "P19.csv"
+file = "P16.csv"
 
 # Load the CSV file using the project directory
 csv_path_valence = os.path.join(project_dir, "RECOLA-Annotation", "emotional_behaviour", "valence", file)
