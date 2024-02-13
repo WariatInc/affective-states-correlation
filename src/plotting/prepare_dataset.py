@@ -14,7 +14,7 @@ for file in files:
     file_eda = file.replace(".csv", ".csv_peaks.csv")
 
     # Load the CSV file using the project directory
-    csv_path_valence = os.path.join(project_dir, "arousal_classes_csv", file)
+    csv_path_valence = os.path.join(project_dir, "valence_classes_csv", file)
     csv_path_eda = os.path.join(project_dir, "EDA_peaks_determined_0_1_csv", file_eda)
 
     # Load the EDA peaks DataFrame

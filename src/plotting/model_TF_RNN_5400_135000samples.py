@@ -8,6 +8,8 @@ import os
 
 # Step 1: Read the CSV file
 project_dir = os.path.dirname(os.path.abspath(__file__))
+print(project_dir)
+ # Assuming you're running this script from the same directory where the CSV file is located
 file = "merged_dataset.csv"
 csv_path = os.path.join(project_dir, "dataset_csv_eda_valence", file)
 data = pd.read_csv(csv_path, delimiter=';')
@@ -39,11 +41,10 @@ model.add(Dense(1, activation='sigmoid'))  # Output layer with sigmoid activatio
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 # Step 9: Train the model
-model.fit(X_train, y_train, epochs=12, batch_size=32, validation_data=(X_test, y_test))
+model.fit(X_train, y_train, epochs=3, batch_size=64, validation_data=(X_test, y_test))
 
 # Step 10: Evaluate the model
+predict_x = model.predict(X_test)
+classes_x = np.where(predict_x > 0.5, 1, 0)  # Convert probabilities to class labels
 
-
-#y_pred = model.predict_classes(X_test)
-
-print(classification_report(y_test, y_pred))
+print(classification_report(y_test, classes_x))

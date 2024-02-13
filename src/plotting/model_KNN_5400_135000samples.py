@@ -18,10 +18,10 @@ X = data[['EDA', 'is_peak']]  # Features
 y = data['classes']  # Target variable
 
 # Step 4: Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=71)
 
 # Step 5: Train the model
-model = KNeighborsClassifier()
+model = KNeighborsClassifier(algorithm='kd_tree')
 model.fit(X_train, y_train)
 
 # Step 6: Evaluate the model
