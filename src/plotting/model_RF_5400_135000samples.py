@@ -13,7 +13,7 @@ print(project_dir)
 file = "merged_dataset.csv"
 
 # Load the CSV file using the project directory
-csv_path = os.path.join(project_dir, "dataset_csv", file)
+csv_path = os.path.join(project_dir, "dataset_csv_eda_valence", file)
 data = pd.read_csv(csv_path, delimiter=';')
 
 

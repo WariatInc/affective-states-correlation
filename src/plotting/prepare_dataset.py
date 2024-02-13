@@ -14,7 +14,7 @@ for file in files:
     file_eda = file.replace(".csv", ".csv_peaks.csv")
 
     # Load the CSV file using the project directory
-    csv_path_valence = os.path.join(project_dir, "valance_classes_csv", file)
+    csv_path_valence = os.path.join(project_dir, "arousal_classes_csv", file)
     csv_path_eda = os.path.join(project_dir, "EDA_peaks_determined_csv", file_eda)
 
     # Load the EDA peaks DataFrame
@@ -34,7 +34,7 @@ for file in files:
 
 
     # Save the resampled DataFrame to a CSV file
-    output_csv_path = os.path.join(project_dir, "dataset_csv", f"{file}")
+    output_csv_path = os.path.join(project_dir, "dataset_csv_eda_arousal", f"{file}")
 
     df.to_csv(output_csv_path, index=False, sep=';')
 
