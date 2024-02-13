@@ -36,7 +36,7 @@ combined_df.to_csv(output_csv_path, index=False, sep=';')
 print("All files processed successfully.")
 
 #############################
-
+ # this was "better" allegedly
 
 # import pandas as pd
 # import os
