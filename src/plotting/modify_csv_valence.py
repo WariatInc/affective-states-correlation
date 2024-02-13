@@ -19,8 +19,8 @@ def add_classes_and_save_to_csv(project_dir, file):
     df_valence['mean_behaviour_rate'] = df_valence[['FM1', 'FM2', 'FM3', 'FF1', 'FF2', 'FF3']].mean(axis=1)
 
     # Define the bins and labels for the class
-    top_neutral_border = 0.15
-    bottom_neutral_border = 0.05
+    top_neutral_border = 0.10000000001
+    bottom_neutral_border = 0.100000000009999
     bins = [-float('inf'), bottom_neutral_border, top_neutral_border, float('inf')]
     labels = [-1, 0, 1]
     df_valence['classes'] = pd.cut(df_valence['mean_behaviour_rate'], bins=bins, labels=labels, include_lowest=True)
