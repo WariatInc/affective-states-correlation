@@ -14,7 +14,7 @@ dfs = []
 
 # Load and concatenate all CSV files into a single DataFrame
 for file in files:
-    csv_path = os.path.join(project_dir, "dataset_csv_eda_valence", file) # dataset_csv_eda_valence, dataset_csv_eda_arousal
+    csv_path = os.path.join(project_dir, "dataset_csv_eda_arousal", file) # dataset_csv_eda_valence, dataset_csv_eda_arousal
     df = pd.read_csv(csv_path, delimiter=';')
     dfs.append(df)
 
@@ -29,7 +29,7 @@ combined_df = pd.concat(dfs, ignore_index=True)
 
 print(combined_df.head())
 
-output_csv_path = os.path.join(project_dir, "dataset_csv_eda_valence", "merged_dataset.csv") #dataset_csv_eda_valence dataset_csv_eda_arousal
+output_csv_path = os.path.join(project_dir, "dataset_csv_eda_arousal", "merged_dataset.csv") #dataset_csv_eda_valence dataset_csv_eda_arousal
 
 combined_df.to_csv(output_csv_path, index=False, sep=';')
 

@@ -13,7 +13,7 @@ print(project_dir)
 file = "merged_dataset.csv"
 
 # Load the CSV file using the project directory
-csv_path = os.path.join(project_dir, "dataset_csv_eda_valence", file) 
+csv_path = os.path.join(project_dir, "dataset_csv_eda_valence", file)
 data = pd.read_csv(csv_path, delimiter=';')
 
 
@@ -24,7 +24,7 @@ X = data[['EDA', 'is_peak']]  # Features
 y = data['classes']  # Target variable
 
 # Step 4: Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=27)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=27)
 
 # Step 5: Train the model
 #model = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42)

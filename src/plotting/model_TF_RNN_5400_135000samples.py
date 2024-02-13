@@ -9,7 +9,7 @@ import os
 # Step 1: Read the CSV file
 project_dir = os.path.dirname(os.path.abspath(__file__))
 file = "merged_dataset.csv"
-csv_path = os.path.join(project_dir, "dataset_csv", file)
+csv_path = os.path.join(project_dir, "dataset_csv_eda_valence", file)
 data = pd.read_csv(csv_path, delimiter=';')
 
 # Step 2: Preprocess the data (if needed)
@@ -32,14 +32,14 @@ X_test = X_test.reshape(-1, 1, 2)
 
 # Step 7: Define the RNN architecture
 model = Sequential()
-model.add(LSTM(128, input_shape=(1, 2)))  # LSTM layer with 64 units
+model.add(LSTM(64, input_shape=(1, 2)))  # LSTM layer with 64 units
 model.add(Dense(1, activation='sigmoid'))  # Output layer with sigmoid activation for binary classification
 
 # Step 8: Compile the model
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 # Step 9: Train the model
-model.fit(X_train, y_train, epochs=8, batch_size=128, validation_data=(X_test, y_test))
+model.fit(X_train, y_train, epochs=12, batch_size=32, validation_data=(X_test, y_test))
 
 # Step 10: Evaluate the model
 
