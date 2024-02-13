@@ -20,7 +20,7 @@ data = pd.read_csv(csv_path, delimiter=';')
 # Step 2: Preprocess the data (if needed)
 
 # Step 3: Split the data into features (X) and target variable (y)
-X = data[['EDA', 'is_peak']]  # Features
+X = data[['EDA', 'is_peak']]  # Features#
 y = data['classes']  # Target variable
 
 # Step 4: Split the data into training and testing sets
