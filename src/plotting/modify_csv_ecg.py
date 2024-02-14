@@ -137,12 +137,12 @@ time_intervals = np.diff(df_biosignals.index[peaks])
 rr_intervals = time_intervals
 rr_intervals = np.append(rr_intervals, 1)
 
-rr_intervals = (1/rr_intervals * 60 - 75)/40
-print(rr_intervals)
+frequency = (1/rr_intervals * 60 - 75)/40
+print(frequency)
 # Now rr_intervals contains the RR intervals
-print("RR Intervals (in seconds):", rr_intervals)
+print("RR Intervals (in seconds):", frequency)
 
-plt.scatter(df_biosignals['ECG_smooth'].index[peaks], eda_smooth_series.iloc[peaks], color='red', label='Original Peaks')
+plt.scatter(df_biosignals['ECG_smooth'].index[peaks], eda_smooth_series.iloc[peaks], color='red', label='ECG Spikes')
 # Plot the associated values
 def fit_polynomial(x_values, y_values):
     trend_lines = []
@@ -156,16 +156,52 @@ def fit_polynomial(x_values, y_values):
         # Fit a polynomial curve to the window
         trend_line = np.poly1d(np.polyfit(x_window, y_window, deg=2))
         trend_lines.append(trend_line(x_values[i]))
+       # df_biosignals['trend_lines'] = trend_lines
     return trend_lines
 
 # Fit the polynomial curve using the nearest 3 samples
-smooth_line_y = fit_polynomial(df_biosignals['ECG_smooth'].index[peaks], rr_intervals)
+frequency_line = fit_polynomial(df_biosignals['ECG_smooth'].index[peaks], frequency)
+resampled_frequency_line = np.interp(df_biosignals.index, df_biosignals['ECG_smooth'].index[peaks], frequency_line)
 
-# Plot the scatter plot of the data points
-plt.scatter(df_biosignals['ECG_smooth'].index[peaks], rr_intervals, color='pink', label='Associated Values')
+# Add the resampled smoothed values as a new column to the existing DataFrame
+df_biosignals['frequency'] = resampled_frequency_line
+plt.plot(df_biosignals.index, df_biosignals['frequency'], label='frequency heartbeat')  #PLOT FREQUENCY
+# Plot the scatter plot of the data points 
 
+plt.scatter(df_biosignals['ECG_smooth'].index[peaks], frequency, color='pink', label='FREQUENCY POINTS') #PLOT FREQUENCY POINTS
+
+
+frequency_column = df_biosignals['frequency']
+mean_of_column_frequency = df_biosignals['frequency'].mean()
+
+high_frequency_points = df_biosignals['frequency'][df_biosignals['frequency'] > mean_of_column_frequency + 0.1]
+
+#Plot the high-frequency points
+plt.scatter(high_frequency_points.index, high_frequency_points, color='magenta', label='High Frequency Points')
+
+# Find peaks using neurokit2 find_peaks function#####################################################################
+# _, nk_data = nk.eda_peaks(frequency_column)
+# peaks = nk_data['SCR_Peaks']
+
+# # Define the number of neighboring points to mark around each peak
+# neighborhood = 2000
+
+# # Create an empty list to store the extended peaks
+# extended_peaks = []
+
+# # Iterate over each detected peak
+# for peak_index in peaks:
+#     # Extend the peak by including neighboring points
+#     extended_peak_indices = np.arange(max(peak_index - neighborhood, 0), min(peak_index + neighborhood + 1, len(frequency_column)))
+#     extended_peaks.extend(extended_peak_indices)
+
+# # Remove duplicate indices
+# extended_peaks = list(set(extended_peaks))
+# plt.scatter(df_biosignals['frequency'].index[extended_peaks], frequency_column.iloc[extended_peaks], color='navy', label='Extended Peaks')
+# plt.scatter(df_biosignals['frequency'].index[peaks], frequency_column.iloc[peaks], color='brown', label='Original Peaks')
+################################################################################################
 # Plot the smoothed trend line
-plt.plot(df_biosignals['ECG_smooth'].index[peaks], smooth_line_y, color='blue', label='Smoothed Trend Line')
+#plt.plot(df_biosignals['ECG_smooth'].index[peaks], smooth_line_y, color='blue', label='Smoothed Trend Line')
 
 
 # ========================================================
