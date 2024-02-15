@@ -99,7 +99,7 @@ eda_smooth_series = df_biosignals['ECG_smooth']
 #Find peaks using scipy's find_peaks function
 peaks, _ = find_peaks(x=eda_smooth_series, distance=500, width=20)
 min_peaks, _ = find_peaks(x=-eda_smooth_series, distance=500, width=20)
-print(peaks)
+#print(peaks)
 # # Find peaks using neurokit2 find_peaks function
 # _, nk_data = nk.eda_peaks(eda_smooth_series)
 # peaks = nk_data['SCR_Peaks']
@@ -135,10 +135,10 @@ time_intervals = np.diff(df_biosignals.index[peaks])
 
 # Convert time intervals to RR intervals (in seconds)
 rr_intervals = time_intervals
-rr_intervals = np.append(rr_intervals, 1)
+rr_intervals = np.append(rr_intervals, rr_intervals[-1])
 
-frequency = (1/rr_intervals * 60 - 75)/40
-print(frequency)
+frequency = (1/rr_intervals * 60 )
+#print(frequency)
 # Now rr_intervals contains the RR intervals
 print("RR Intervals (in seconds):", frequency)
 
@@ -148,8 +148,8 @@ def fit_polynomial(x_values, y_values):
     trend_lines = []
     for i in range(len(x_values)):
         # Take the nearest 3 samples
-        start_idx = max(0, i -3)
-        end_idx = min(len(x_values), i +4)
+        start_idx = max(0, i -1)
+        end_idx = min(len(x_values), i +2)
         x_window = x_values[start_idx:end_idx]
         y_window = y_values[start_idx:end_idx]
 
@@ -174,11 +174,14 @@ plt.scatter(df_biosignals['ECG_smooth'].index[peaks], frequency, color='pink', l
 frequency_column = df_biosignals['frequency']
 mean_of_column_frequency = df_biosignals['frequency'].mean()
 
-high_frequency_points = df_biosignals['frequency'][df_biosignals['frequency'] > mean_of_column_frequency + 0.1]
+high_frequency_points = df_biosignals['frequency'][df_biosignals['frequency'] > mean_of_column_frequency*1]
 
+high_frequency_indices = np.array(high_frequency_points.index)
 #Plot the high-frequency points
 plt.scatter(high_frequency_points.index, high_frequency_points, color='magenta', label='High Frequency Points')
 
+high_frequency_points = list(set(high_frequency_points))
+print(high_frequency_indices)
 # Find peaks using neurokit2 find_peaks function#####################################################################
 # _, nk_data = nk.eda_peaks(frequency_column)
 # peaks = nk_data['SCR_Peaks']
@@ -206,32 +209,37 @@ plt.scatter(high_frequency_points.index, high_frequency_points, color='magenta',
 
 # ========================================================
 
-def mark_peaks_and_save_to_csv_EDA(project_dir, file, extended_peaks):
-    # Create a DataFrame with time indices
-    df_all_indices = pd.DataFrame({'time': range(len(df_biosignals))})
-    
-    # Mark whether each index corresponds to a peak or not
-    df_all_indices['is_peak'] = df_all_indices['time'].isin(extended_peaks)
+def mark_peaks_and_save_to_csv_ECG(project_dir, file, high_frequency_points):
+    # df_all_indices = pd.DataFrame({'time': range(len(df_biosignals))})
 
-    # Load the CSV file using the project directory
-    csv_path_biosignals = os.path.join(project_dir, "RECOLA-Biosignals-recordings", file)
-    
+    # # Mark whether each index corresponds to a HIGH FREQUENCY OR NOT
+    # df_all_indices['is_high_frequency'] = df_all_indices['time'].isin(high_frequency_points)
+
+    # # Load the CSV file using the project directory
+    # csv_path_biosignals = os.path.join(project_dir, "RECOLA-Biosignals-recordings", file)
+
     # Read the CSV file into a DataFrame
     df_biosignals2 = pd.read_csv(csv_path_biosignals, delimiter=';')
 
     # Define the output CSV path
     output_csv_path = os.path.join(project_dir, "ECG_peaks_determined_csv", f"{file}_peaks.csv")
 
-    # Concatenate the 'is_peak' column with df_biosignals2
-    df_biosignals2['is_peak'] = df_all_indices['is_peak']
-    
+    # # Concatenate the 'is_peak' column with df_biosignals2
+    # df_biosignals2['is_high_frequency'] = df_all_indices['is_high_frequency']
+
     # Drop the 'ECG' column
-    df_biosignals2.drop(columns=['ECG '], inplace=True)
-    
+    df_biosignals2.drop(columns=['EDA'], inplace=True)
+
+    df_biosignals2['is_high_frequency'] = False
+
+    # Mark rows as True where 'time' matches high frequency indices
+    df_biosignals2.loc[df_biosignals2['time'].isin(high_frequency_indices), 'is_high_frequency'] = True
+
+
     # Save the concatenated DataFrame to a CSV file with delimiter ';'
     df_biosignals2.to_csv(output_csv_path, index=False, sep=';')
 
-#mark_peaks_and_save_to_csv_EDA(project_dir, file, extended_peaks)
+#mark_peaks_and_save_to_csv_ECG(project_dir, file, high_frequency_points)
 
 
 
@@ -287,5 +295,5 @@ plt.grid(True)
 # normalized_derivative = (rolling_mean - rolling_mean.min()) / (rolling_mean.max() - rolling_mean.min()) - 0.5
 # plt.plot(df_biosignals.index, normalized_derivative, label='Derivative', linestyle='--')
 
-plt.show()
+#plt.show()
 #python src/plotting/modify_csv_ecg.py P16.csv && python src/plotting/modify_csv_ecg.py P19.csv && python src/plotting/modify_csv_ecg.py P21.csv && python src/plotting/modify_csv_ecg.py P23.csv && python src/plotting/modify_csv_ecg.py P25.csv && python src/plotting/modify_csv_ecg.py P26.csv && python src/plotting/modify_csv_ecg.py P28.csv && python src/plotting/modify_csv_ecg.py P30.csv && python src/plotting/modify_csv_ecg.py P34.csv && python src/plotting/modify_csv_ecg.py P37.csv && python src/plotting/modify_csv_ecg.py P39.csv && python src/plotting/modify_csv_ecg.py P41.csv && python src/plotting/modify_csv_ecg.py P42.csv && python src/plotting/modify_csv_ecg.py P45.csv && python src/plotting/modify_csv_ecg.py P46.csv && python src/plotting/modify_csv_ecg.py P56.csv && python src/plotting/modify_csv_ecg.py P64.csv && python src/plotting/modify_csv_ecg.py P65.csv

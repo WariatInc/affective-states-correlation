@@ -118,6 +118,7 @@ for peak_index in peaks:
 
 # Remove duplicate indices
 extended_peaks = list(set(extended_peaks))
+print(extended_peaks)
 
 # Plot peaks scatter points and lines
 # plt.scatter(df_biosignals['EDA_smooth'].index[extended_peaks], eda_smooth_series.iloc[peaks], color='red', label='Peaks')
@@ -154,7 +155,7 @@ def mark_peaks_and_save_to_csv_EDA(project_dir, file, extended_peaks):
     # Save the concatenated DataFrame to a CSV file with delimiter ';'
     df_biosignals2.to_csv(output_csv_path, index=False, sep=';')
 
-mark_peaks_and_save_to_csv_EDA(project_dir, file, extended_peaks)
+#mark_peaks_and_save_to_csv_EDA(project_dir, file, extended_peaks)
 
 
 
