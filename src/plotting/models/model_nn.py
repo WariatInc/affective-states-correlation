@@ -11,7 +11,7 @@ from tensorflow.keras.layers import Dense
 project_dir = os.path.dirname(os.path.abspath(__file__))
 print(project_dir)
 
-csv_nn = os.path.join(project_dir, "nn_dataset")
+csv_nn = os.path.join(project_dir,'../', "nn_dataset")
 csv_nn_list = glob.glob(csv_nn + '/*')
 NUM_CLASSES = 2
 

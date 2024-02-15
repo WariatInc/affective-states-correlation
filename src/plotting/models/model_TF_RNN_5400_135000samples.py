@@ -11,7 +11,7 @@ project_dir = os.path.dirname(os.path.abspath(__file__))
 print(project_dir)
  # Assuming you're running this script from the same directory where the CSV file is located
 file = "merged_dataset.csv"
-csv_path = os.path.join(project_dir, "dataset_csv_eda_valence", file)
+csv_path = os.path.join(project_dir, '../', "dataset_csv_eda_valence", file)
 data = pd.read_csv(csv_path, delimiter=';')
 
 # Step 2: Preprocess the data (if needed)

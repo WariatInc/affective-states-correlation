@@ -8,12 +8,13 @@ import os
 # Step 1: Read the CSV file
 
 project_dir = os.path.dirname(os.path.abspath(__file__))
+#project_dir = os.path.abspath(__file__)
 print(project_dir)
 
 file = "merged_dataset.csv"
 
 # Load the CSV file using the project directory
-csv_path = os.path.join(project_dir, "dataset_csv_eda_valence", file)
+csv_path = os.path.join(project_dir, '../', "dataset_csv_eda_arousal", file)
 data = pd.read_csv(csv_path, delimiter=';')
 
 
