@@ -1,5 +1,3 @@
-src/plotting/svm_dataset/merged_dataset_svm.csv
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
